@@ -70,6 +70,12 @@ async def receive_message(
         # 填写处理逻辑-开始
         if type == "text":
             print("文本信息")
+            content_tuple = content.split("@#")
+            if len(content_tuple) == 2:
+                # 流水处理
+                journal_data_insert(content_tuple[0], content_tuple[1])
+            else:
+                print("格式错误")
         elif type == "urlLink":
             print("链接卡片")
         elif type == "file":
@@ -95,9 +101,41 @@ async def receive_message(
 
 
 def journal_data_insert(wx_id, money):
-    sql = 'insert into journal (wx_id, money) values (%s, %s)'%wx_id,money
-    pgsqlUtil.execute(sql)
+    sql = "insert into myroot.yangming.tb_journal (wx_id, money) values ('%s', %f);" % (wx_id, float(money))
+    pgsqlUtil.execute_aud(sql)
+
+
+def send_wx_msg(msg):
+    import requests
+    import json
+
+    # 设置URL
+    url = 'http://localhost:3001/webhook/msg/v2?token=123'
+
+    # 设置请求头
+    headers = {
+        'Content-Type': 'application/json'
+    }
+
+    # 设置数据
+    data = {
+        'to': 'Three Parvenu',
+        'isRoom': True,
+        'data': {
+            'type': 'text',
+            'content': msg
+        }
+    }
+
+    # 发送POST请求
+    response = requests.post(url, headers=headers, json=data)
+
+
+    # 打印响应内容
+    print(response.text)
 
 
 if __name__ == "__main__":
+    # send_wx_msg("aaa")
+
     uvicorn.run(app, host="0.0.0.0", port=3000)

@@ -51,11 +51,17 @@ class PGSQLUtil:
         self.__cursor.execute("SELECT * FROM  information_schema.table_privileges", vars)
         return self.__cursor.fetchall()
 
-    def execute(self, sql, vars=None):
+    def execute_c(self, sql, vars=None):
         """获取SQL执行结果"""
         # self.__cursor = self.__conn.cursor(cursor_factory=RealDictCursor)
         self.__cursor.execute(sql, vars)
         return self.__cursor.fetchall()
+
+    def execute_aud(self, sql, vars=None):
+        """获取SQL执行结果"""
+        # self.__cursor = self.__conn.cursor(cursor_factory=RealDictCursor)
+        self.__cursor.execute(sql, vars)
+        self.get_conn().commit()
 
     def get_version(self, vars=None):
         """获取MySQL版本"""
